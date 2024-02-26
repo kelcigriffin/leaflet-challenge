@@ -1,6 +1,6 @@
 // We create the tile layer that will be the background of our map.
 let basemap = L.tileLayer(
-    "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'"
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
     );
   
   
@@ -22,17 +22,17 @@ let basemap = L.tileLayer(
     function getColor(depth) {
       switch (true) {
         case depth > 90:
-          // RETURN A COLOR HEX CODE 
+          return "#FF0000"; // RED 
         case depth > 70:
-          // RETURN A COLOR HEX CODE 
+          return "#FF6701"; // DEEP ORANGE 
         case depth > 50:
-          // RETURN A COLOR HEX CODE 
+          return "#FFA500"; // ORANGE
         case depth > 30:
-          // RETURN A COLOR HEX CODE 
+          return "#FBE870"; // YELLOW
         case depth > 10:
-          // RETURN A COLOR HEX CODE 
+          return "#DFFF00"; // YELLOW-GREEN 
         default:
-          // RETURN A COLOR HEX CODE 
+          return "#ADFF2F"; // GREEN 
       }
     }
   
@@ -51,10 +51,13 @@ let basemap = L.tileLayer(
     // to calculate the color and radius.
     function styleInfo(feature) {
       return {
-          // USE STYLE ATTRIBUTES (e.g., opacity, fillOpacity, stroke, weight) 
-        fillColor: // DETERMINE COLOR USING getColor() function 
+        // USE STYLE ATTRIBUTES (e.g., opacity, fillOpacity, stroke, weight) 
+        fillColor: getColor(feature.geometry.coordinates[2]), // Using depth for color
         color: "#000000",
-        radius: // DETERMINE RADIUS USING getRadius() function 
+        radius: getRadius(feature.properties.mag), // Using magnitude for radius
+        weight: 0.6, // Make the black outlines thinner
+        opacity: 1, // Set the opacity of the black outlines
+        fillOpacity: 0.8 // Set the opacity of the fill color
       };
     }
   
@@ -63,18 +66,15 @@ let basemap = L.tileLayer(
       
       // We turn each feature into a circleMarker on the map.
       pointToLayer: function (feature, latlng) {
-        return L.circleMarker(latlng);
-      },
-      
-      // We set the style for each circleMarker using our styleInfo function.
-      style: styleInfo,
-      
-      // We create a popup for each marker to display the magnitude and location of the earthquake after the marker has been created and styled
-      onEachFeature: function (feature, layer) {
-        layer.bindPopup(
-          // YOUR CODE HERE 
+        let circleMarker = L.circleMarker(latlng, styleInfo(feature));
+
+        // We add a popup for each marker to display the magnitude and location of the earthquake.
+        circleMarker.bindPopup(
+          `<strong>Magnitude:</strong> ${feature.properties.mag}<br><strong>Location:</strong> ${feature.properties.place}`
         );
-      }
+    
+        return circleMarker;
+      },
     }).addTo(map);
   
     // Create a legend control object.
@@ -88,13 +88,22 @@ let basemap = L.tileLayer(
   
       let grades = [-10, 10, 30, 50, 70, 90];
       let colors = [
-        // COLOR HEX CODES SPECIFIED IN getColor() function 
+        // COLOR HEX CODES SPECIFIED IN getColor() function
+        "#ADFF2F",
+        "#DFFF00",
+        "#FBE870",
+        "#FFA500",
+        "#FF6701",
+        "#FF0000"
       ];
   
       // Looping through our intervals to generate a label with a colored square for each interval.
       for (let i = 0; i < grades.length; i++) {
-        // YOUR CODE HERE 
+        div.innerHTML +=
+          '<i style="background:' + colors[i] + '"></i> ' +
+          grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
       }
+      
       return div;
     };
   
