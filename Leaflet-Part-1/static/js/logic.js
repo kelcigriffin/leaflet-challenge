@@ -68,10 +68,10 @@ let basemap = L.tileLayer(
       pointToLayer: function (feature, latlng) {
         let circleMarker = L.circleMarker(latlng, styleInfo(feature));
 
-        // We add a popup for each marker to display the magnitude and location of the earthquake.
-        circleMarker.bindPopup(
-          `<strong>Magnitude:</strong> ${feature.properties.mag}<br><strong>Location:</strong> ${feature.properties.place}`
-        );
+        // We add a popup for each marker to display the magnitude, location, and depth of the earthquake.
+    circleMarker.bindPopup(
+      `<strong>Magnitude:</strong> ${feature.properties.mag}<br><strong>Location:</strong> ${feature.properties.place}<br><strong>Depth:</strong> ${feature.geometry.coordinates[2]} km`
+    );
     
         return circleMarker;
       },
